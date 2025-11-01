@@ -80,7 +80,8 @@ COPY monitor.py /home/appuser/code/
 
 # Move sshd to Port 2222
 # change /etc/ssh/sshd_config by uncommenting Port 22 and changing it to Port 2222
-RUN sed -i.orig -e 's/^#\(Port 22\)/\122/' /etc/ssh/sshd_config
+RUN sed -i.orig -e 's/^#\(Port 22\)/\122/' \
+    -e 's/^#\(AddressFamily\).*$/\1 any/' /etc/ssh/sshd_config
 
 # Expose SSH port
 # Changed from 22 to 2222
