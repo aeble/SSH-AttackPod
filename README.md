@@ -5,7 +5,7 @@ The NetWatch SSH-AttackPod is a modified OpenSSH server that records any attempt
 #### Prerequisites
 To be able to run a SSH-AttackPod you need: 
 
- - to have [Docker installed](#1-installation-of-docker)
+ - to have [Docker installed](#1-installation-of-docker) or [podman](#2-installation-of-podman)
  - [obtain an API-key](#1-obtain-an-api-key-from-netwatch)
  - public IP address: If the system you are running SSH-AttackPod on is not reachable over the internet you have to configure port forwarding on your firewall
 
@@ -58,7 +58,7 @@ When you're finished reviewing, you can stop with `[Ctrl-C]`.
 
 #### 5. Switch SSH-AttackPod to production mode (non test-mode)
 
- 1. Edit the `.env` file and change NETWATCH_TEST_MODE to false:
+ 1. Edit the `.env` file and change `NETWATCH_TEST_MODE` to `false`:
 
     ```bash
     NETWATCH_TEST_MODE=false
@@ -72,9 +72,9 @@ When you're finished reviewing, you can stop the log output with `[Ctrl-C]`.
 
 ## Testing the SSH-AttackPod
 
-When your SSH-AttackPod is running, all login attempts are being send to the Netwatch project. **This may include any attempt of you to test the system or when you try to login with your normal username and password for your system!**
+When your SSH-AttackPod is running, all login attempts are being sent to the Netwatch project. **This may include any attempt of you to test the system or when you try to login with your normal username and password for your system!**
 
-If you want to test whether the AttackPod is working as expected, you can enable *TEST_MODE* by adding NETWATCH_TEST_MODE=true to your `.env` file. This will configure the AttackPod to register and submit the attacks, but the backend will discard them and not take further action.
+If you want to test whether the AttackPod is working as expected, you can enable *TEST_MODE* by adding `NETWATCH_TEST_MODE=true` to your `.env` file. This will configure the AttackPod to register and submit the attacks, but the backend will discard them and not take further action.
 
 *Please remember to revert this change once you have completed your testing!*
 
@@ -110,7 +110,37 @@ To install Docker, follow the [Docker Installation](https://docs.docker.com/engi
     docker compose version
     ```
 
-#### 2. Run SSH-AttackPod on default ssh port 22
+#### 2. Installation of Podman (ALTERNATIVE TO DOCKER!)
+
+Podman is a more modern alternative container engine than Docker. It is pretty much a drop-in replacement as well als podman-compose. The SSH-AttackPod has been proven to run on podman as well. 
+
+**Attention: You do not need this if you have already installed docker!!!**
+
+To install podman, follow the [Podman Installation](https://podman.io/docs/installation) instructions. For Ubuntu-based systems, the steps are as follows:
+
+  1. The podman package is available in the official repositories for Ubuntu 20.10 and newer.
+
+     ```bash
+     # Ubuntu 20.10 and newer
+     sudo apt-get update
+     sudo apt-get -y install podman podman-compose
+     ```
+     
+  2. Verify that podman and podman-compose are running by using the following commands:
+     
+     ```bash
+     podman version
+     podman compose version
+     ```
+  3. Verify that podman has created both an IPv4 and an IPv6 network:
+
+     ```bash
+     podman network inspect ssh-attackpod_default
+     ```
+     
+     and check whether `"ipv6_enabled": true` or `false`. This seems to be an issue with Ubuntu, it does work on Arch Linux.
+
+#### 3. Run SSH-AttackPod on default ssh port 22
 
 If you want to run SSH-AttackPod on ssh's default port 22 you can do by changing the NETWATCH_PORT in the `.env` file
 
@@ -120,7 +150,7 @@ If you want to run SSH-AttackPod on ssh's default port 22 you can do by changing
     NETWATCH_PORT=22
     ```
 
-If you have already an sshd running it's default port is 22 so you **must** change the port of your sshd to another port. In these instructions we move it to port 2222. You need root privileges to do this. 
+If you have already an sshd running its default port is 22 so you **must** change the port of your sshd to another port. In these instructions we move it to port 2222. You need root privileges to do this. 
 
 **Beware!** If your system is not reachable directly (e.g. it's behind a firewall) and you have a port forwarding to the system ensure that when changing sshd's port that the port forwarding rule in your firewall is changed to the new port! Otherwise you will lose access! 
 
@@ -155,7 +185,7 @@ Depending on Linux distribution you use you may need to reconfigure `/etc/ssh/ss
      systemctl status ssh.socket
      ```
 
-#### 3. (Re-)Build SSH-AttackPod from source
+#### 4. (Re-)Build SSH-AttackPod from source
 
 If you want to build SSH-AttackPod from source you can do by: 
 
